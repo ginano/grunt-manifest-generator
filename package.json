@@ -1,0 +1,42 @@
+{
+  "name": "grunt-manifest-generator",
+  "description": "this tool will scan all the html files, and get all the images, css, js, html to generator the manifest file.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/ginano/grunt-manifest-generator",
+  "author": {
+    "name": "ginano",
+    "email": "www@ginano.net",
+    "url": "http://www.ginano.net"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ginano/grunt-manifest-generator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ginano/grunt-manifest-generator/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/ginano/grunt-manifest-generator/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "Gruntfile.js",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "dependencies": {
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.1"
+  },
+  "keywords": [
+    "gruntplugin",
+    "manifest",
+    "generator",
+    "combo"
+  ]
+}

@@ -1,0 +1,15 @@
+CACHE MANIFEST
+# Thu Aug 22 2013 20:58:16 GMT+0800 (中国标准时间)
+NETWORK:
+*
+CACHE:
+test/test.html
+http://www.ginano.net/wp-includes/js/jquery/jquery.js?ver=1.8.3
+http://www.ginano.net/wp-content/plugins/crayon-syntax-highlighter/js/min/crayon.min.js?ver=2.2.1
+http://www.douban.com/service/badge/52688984/?show=dolist&amp;select=random&amp;n=6&amp;columns=3&amp;hideself=yes&amp;cat=book
+http://www.douban.com/service/badge/52688984/?show=collection&amp;select=random&amp;n=9&amp;columns=3&amp;hideself=yes&amp;cat=book
+http://static.duoshuo.com/embed.js?ver=3.5.1
+http://www.ginano.net/wp-content/plugins/wp-slimstat/wp-slimstat.js
+http://www.ginano.net/wp-content/themes/twentyten/style.css
+test/output/images/common/1.jpg
+http://blog.ginano.net/wp-content/uploads/2013/03/m_1288769269631.jpg
