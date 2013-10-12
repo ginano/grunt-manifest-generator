@@ -39,7 +39,9 @@ module.exports = function(grunt) {
           //all the files above but the fllowwing files.
           //{Array} the item could be writen as regexpress.
           //default:[]
-          excludeFiles:['/\.png$/']
+          excludeFiles:['/\.png$/'],
+          //all the files below will be add to the manifest files.
+          extraFiles:[]
         },
         files: {
           'test.manifest': ['test/test.html']

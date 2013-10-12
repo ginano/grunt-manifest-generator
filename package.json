@@ -1,7 +1,7 @@
 {
   "name": "grunt-manifest-generator",
   "description": "this tool will scan all the html files, and get all the images, css, js, html to generator the manifest file.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/ginano/grunt-manifest-generator",
   "author": {
     "name": "ginano",

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html manifest="weibo.manifest">
+<head>
+<meta charset="utf-8" />
+<title>微博详情</title>
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta name=viewport content="initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+<script header="true">
+	//优先进入应用模式
+	if(window.dolphin && window.dolphin.launchWebAppMode){
+		window.dolphin.launchWebAppMode();
+	}else if(window.dolphinWebapp && window.dolphinWebapp.requestWebAppMode){
+		window.dolphinWebapp.requestWebAppMode();
+	}
+</script>
+<script  header="true">
+	//页面perf tracking
+	window.perf = {
+		startTime : {
+			launch : new Date().getTime()
+		},
+		trackNow : function(){
+			return this.trackEnd("launch");
+		},
+		trackStart : function(key){
+			this.startTime[key] = new Date().getTime();
+		},
+		trackEnd : function(key){
+			return new Date().getTime() - this.startTime[key];
+		}
+	};
+</script>
+<link rel="stylesheet" type="text/css" href="detail.css" />
+<script header="true">
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	ga('create', 'UA-41492209-1', 'dolphin.com');
+	ga('send', 'pageview');
+
+	(function(){
+		function addListener(obj, eventName, listener) {
+			if(obj.addEventListener) {
+				obj.addEventListener(eventName, listener, false);
+			} else {
+				obj.attachEvent("on" + eventName, listener);
+			}
+		}
+		addListener(document, "DOMContentLoaded", function(){
+			ga('send', 'timing', 'page', 'DOMContentLoaded', perf.trackNow());
+		});
+		addListener(window, "load", function(){
+			ga('send', 'timing', 'page', 'load', perf.trackNow());
+		});
+	})();
+
+	(function(){
+		var trackKey = "fastboot_tracking";
+		if(typeof(Storage) !== "undefined"){
+			var events = JSON.parse(sessionStorage.getItem(trackKey) || "[]");
+			for(var i=0; i<events.length; ++i){
+				ga.apply(window, events[i]);
+			}
+			sessionStorage.removeItem(trackKey);
+		}
+	})();
+
+</script>
+<style type="text/css">
+.class{background: url(images/hello.gif);}
+.test{background-image:url(../output/1.png);}
+</style>
+</head>
+<body id="body" style="background:url(./images/2.jpeg);">
+	<section id="detail" style="display:none;">
+		<div id="detail_w">
+			<div id="detail_hd" class="detail_hd_normal">
+				<img src="images/portrait.gif" alt="" id="detail_user_portrait">
+				<div id="detail_usermsg">
+					<div id="detail_username"></div>
+					<div id="detail_date"></div>
+				</div>
+				<div id="btn_user" class="btn_user icon-next"></div>
+			</div>
+			<div id="detail_text_w">
+				<p id="detail_text"></p>
+				<div id="detail_pic" class="img_wrapper" style="display:none">
+					<div class="loading_wrapper">
+						<div class="loading_bars">
+							<div class="loading_bar bar_1"></div>
+							<div class="loading_bar bar_2"></div>
+							<div class="loading_bar bar_3"></div>
+							<div class="loading_bar bar_4"></div>
+						</div>
+						<p>图片努力加载中...</p>
+					</div>
+					<div class="load_failure">
+						(*&gt;﹏&lt;*)<br>图片加载失败了
+					</div>
+					<img style="display:none;">
+				</div>
+			</div>
+			<div id="detail_origin" style="display:none";>
+				<div id="detail_origin_text">
+					<a id="detail_origin_userlink" href="javascript:void(0);"></a>:<span id="detail_origin_contents"></span>
+				</div>
+				<div id="detail_origin_pic" class="img_wrapper" style="display:none">
+					<div class="loading_wrapper">
+						<div class="loading_bars">
+							<div class="loading_bar bar_1"></div>
+							<div class="loading_bar bar_2"></div>
+							<div class="loading_bar bar_3"></div>
+							<div class="loading_bar bar_4"></div>
+						</div>
+						<p>图片努力加载中...</p>
+					</div>
+					<div class="load_failure">
+						(*&gt;﹏&lt;*)<br>图片加载失败了
+					</div>
+					<img style="display:none;">
+				</div>
+				<div id="detail_origin_bot">
+					<span id="detail_origin_date"></span>
+					<span id="detail_origin_fwd">转发<span id="origin_fwd_count"></span></span>
+					&nbsp;|&nbsp;
+					<span id="detail_origin_cmt">评论<span id="origin_cmt_count"></span></span>
+				</div>
+			</div>
+			<h2 id="detail_extra_tt">
+				<span id="detail_extra_tt_fwd" class="detail_extra_tt_item">转发<span id="detail_extra_tt_fwd_cnt"></span></span>
+				<span id="detail_extra_tt_depart">|</span>
+				<span id="detail_extra_tt_cmt" class="detail_extra_tt_item active">评论<span id="detail_extra_tt_cmt_cnt"></span></span>
+			</h2>
+			<div id="detail_extra_wrapper" style="display:none;">
+				<div id="detail_extra_fwd" style="display: none">
+					<div id="detail_fwdlist_c"></div>
+					<div class="page_loading">努力加载中...</div>
+				</div>
+				<div id="detail_extra_cmt" style="">
+					<div id="detail_cmtlist_c"></div>
+					<div class="page_loading">努力加载中...</div>
+				</div>
+			</div>
+
+			<div id="popup_user_guide" style="display:none;">
+				<p>无限精彩，尽在评论！</p>
+				<div id="popup_download" class="popup_btn">
+					<div>
+						<span class="dolphin icon"></span>
+						下载海豚浏览器
+					</div>
+				</div>
+				<div id="popup_login" class="popup_btn">
+					<div>
+						<span class="weibo icon icon-weibo"></span>
+						<span id="popup_login_msg">使用微博帐号登录</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<div id="input_w" style="display: none;">
+		<div id="input_inner">
+			<div id="input_close" class="icon-arrow-left"></div>
+			<div id="input_send" class="input_send_disable"><span id="input_send_text">发送</span></div>
+			<textarea id="input_ta" class="input_ta input_blur"></textarea>
+			<div id="input_wordsnum" class="input_wordsnum_normal" style="display:none;">140</div>
+		</div>
+	</div>
+	<div id="footbar">
+		<div id="footbar_inner">
+			<span id="fb_back" class="btn icon-arrow-left"></span>
+			<span id="fb_share" class="btn icon-share-alt"></span>
+			<span id="fb_comment" class="btn icon-comment"></span>
+		</div>
+	</div>
+	<div id="loading_mask" style="display:none;">
+		<div id="loading_icon"></div>
+		<div id="loading_msg"></div>
+	</div>
+	<script type="text/javascript" src="http://webapp.statics.dolphin.com/web_statics/scripts/zepto.min.js"></script>
+	<script type="text/javascript" src="scripts/utils.js"></script>
+	<script type="text/javascript" src="scripts/this.js"></script>
+</body>
+</html>

@@ -77,3 +77,5 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 2013-8-23 0.1.0 create the plugin
+
+2013-10-12 0.1.1 add the extraFiles option for add some extra files to the manifest file. optimize the rule of geting image files from htmlcontent.

@@ -28,10 +28,12 @@ module.exports = function(grunt) {
       includeCssImage: true,
       includeJS: true,
       excludeFiles: [],
+      extraFiles:[],
       network: '*'
     });
     var Alldone = this.async();
     var filesDone = {};
+    var allDoneStamp=false;
     var _v = Date.now();
     /**
      * check all the files have been generated
@@ -40,6 +42,10 @@ module.exports = function(grunt) {
 
     function checkAllManifestDone() {
       Util.checkAllDone(filesDone, function() {
+        if(allDoneStamp){
+          return;
+        }
+        allDoneStamp = true;
         Alldone();
       });
     }
@@ -123,7 +129,7 @@ module.exports = function(grunt) {
           _list.forEach(function(js) {
             var str = js.match(/src=["']?\s*([^>"']+)\s*["']?/i)[1].trim(),
               _path;
-            if (/^data:/.test(str)) {
+            if (/^['"]?data:/i.test(str)) {
               return;
             }
             _path = Util.getRelativePath(manifestfile, Util.getAbsolutePath(fileObj.path, str));
@@ -136,11 +142,16 @@ module.exports = function(grunt) {
       if (OPT.includeHtmlImage) {
         Util.log('find out the followwing images from html content:');
         htmlSourceList.forEach(function(fileObj) {
-          var _list = fileObj.content.match(/<img\s+(?:[^>]+\s+)?src=["']?\s*([^>]+)\s*["']?[\s>\/]/ig) || [];
+          //need clear the fake images from js content
+          var _list = fileObj.content.replace(/<script[^>]*>(?:[\s\S]*?)<\/script\s*>/ig,'').match(/<img\s+(?:[^>]+\s+)?src=["']?\s*([^>]+)\s*["']?[\s>\/]/ig) || [];
           _list.forEach(function(img) {
-            var str = img.match(/src=["']?\s*([^>"']+)\s*["']?/i)[1].trim(),
-              _path;
-            if (/^data:/.test(str)) {
+            var str = img.match(/src=["']?\s*([^>"']+)\s*["']?/i),
+                _path;
+            if(!str){
+              return;
+            }
+            str = str[1].trim();
+            if(/^['"]?data:/i.test(str)){
               return;
             }
             _path = Util.getRelativePath(manifestfile, Util.getAbsolutePath(fileObj.path, str));
@@ -158,7 +169,7 @@ module.exports = function(grunt) {
           _list.forEach(function(css) {
             var str = css.match(/href=(?:"\s*|'\s*)?([^>"']+)\s*(?:'|"|\s)?/i)[1].trim(),
               _path;
-            if (/^data:/.test(str)) {
+            if (/^['"]?data:/i.test(str)) {
               return;
             }
             _path = Util.getRelativePath(manifestfile, Util.getAbsolutePath(fileObj.path, str));
@@ -169,11 +180,11 @@ module.exports = function(grunt) {
         if (OPT.includeCssImage) {
           // inline style images
           htmlSourceList.forEach(function(fileObj) {
-            var _list = fileObj.content.match(/url\s*\([^\)]+\)/ig) || [];
+            var _list = fileObj.content.replace(/<script[^>]*>(?:[\s\S]*?)<\/script\s*>/ig,'').match(/url\s*\([^\)]+\)/ig) || [];
             _list.forEach(function(css) {
               var str = css.match(/^url\(([^\)]+)\)$/i)[1].trim(),
                 _path;
-              if (/^data:/.test(str)) {
+              if (/^['"]?data:/i.test(str)) {
                 return;
               }
               _path = Util.getRelativePath(manifestfile, Util.getAbsolutePath(fileObj.path, str));
@@ -194,7 +205,7 @@ module.exports = function(grunt) {
               _list.forEach(function(img) {
                 var str = img.match(/^url\(([^\)]+)\)$/i)[1].trim(),
                   __path;
-                if (/^data:/.test(str)) {
+                if (/^['"]?data:/i.test(str)) {
                   return;
                 }
                 __path = Util.getRelativePath(manifestfile, Util.getAbsolutePath(_path, str));
@@ -218,8 +229,12 @@ module.exports = function(grunt) {
 
       function checkDone() {
         Util.checkAllDone(delayList, function() {
+
           var _list = cssList.concat(imageList),
             _opt = options;
+          if(filesDone[manifestfile].isDone ){
+            return;
+          }
           //i should log this result just here;
           Util.log('find out the followwing images from style content:');
           Util.log(imageList.join('\n'));
@@ -246,12 +261,18 @@ module.exports = function(grunt) {
               }
             }
           });
+          //add the addtionnal FILES
+          Util.log('\n\nadd the extra files:');
+          _opt.extraFiles.forEach(function(item){
+            allFiles[item.trim()] = true;
+            Util.log('file :[' + p + '] has been include!');
+          });
           filesDone[manifestfile].isDone = true;
           generateManifest(manifestfile, allFiles, _opt);
           //add the manifest file to the html files
           htmlSourceList.forEach(function(item){
               var _path = Util.getRelativePath(item.path, manifestfile);
-              item.content= item.content.replace(/\s+manifest=(?:'\s*|"\s*)?[^>]+(?:\s*'|\s*")?\s*/i,' ').replace(/<html\s+/i, '<html manifest="'+_path+'"');
+              item.content= item.content.replace(/\s+manifest=(?:'\s*|"\s*)?[^>]+(?:\s*'|\s*")?\s*/i,' ').replace(/<html\s*/i, '<html manifest="'+_path+'" ');
               File.write(item.path, item.content);
           });
 
