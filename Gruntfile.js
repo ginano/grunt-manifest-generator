@@ -40,11 +40,12 @@ module.exports = function(grunt) {
           //{Array} the item could be writen as regexpress.
           //default:[]
           excludeFiles:['/\.png$/'],
-          //all the files below will be add to the manifest files.
-          extraFiles:[]
+          //addtional files
+          extraFiles:['loading_faild.png']
         },
         files: {
-          'test.manifest': ['test/test.html']
+          'test.manifest': ['test/*.html'],
+          'index.manifest':['test/index.html']
         }
       }
     }

@@ -79,3 +79,5 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 2013-8-23 0.1.0 create the plugin
 
 2013-10-12 0.1.1 add the extraFiles option for add some extra files to the manifest file. optimize the rule of geting image files from htmlcontent.
+
+2013-11-25 0.1.2-0.1.3 add some comments for the sourecode. change the usage of lib/util.

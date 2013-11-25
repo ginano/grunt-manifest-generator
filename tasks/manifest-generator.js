@@ -12,7 +12,7 @@ module.exports = function(grunt) {
   var path = require('path');
   var URL = require('url');
   var http = require('http');
-  var Util = require('./lib/util').init(grunt);
+  var Util = require('./lib/util');
   var File = grunt.file;
 
 
@@ -21,6 +21,7 @@ module.exports = function(grunt) {
 
   grunt.registerMultiTask('manifestGenerator', 'get all files form setting.', function() {
     // Merge task-specific and/or target-specific options with these defaults.
+    // 获取配置项
     var options = this.options({
       includeHTML: true,
       includeHtmlImage: true,
@@ -31,6 +32,7 @@ module.exports = function(grunt) {
       extraFiles:[],
       network: '*'
     });
+    //保留任务完成句柄
     var Alldone = this.async();
     var filesDone = {};
     var allDoneStamp=false;
@@ -39,7 +41,10 @@ module.exports = function(grunt) {
      * check all the files have been generated
      * @return {[type]}
      */
-
+     /**
+      * 判断是否完成所有的manifest文件生成
+      * @return {[type]} [description]
+      */
     function checkAllManifestDone() {
       Util.checkAllDone(filesDone, function() {
         if(allDoneStamp){
@@ -52,11 +57,11 @@ module.exports = function(grunt) {
 
     /**
      * generate the manifest file with fies
+     * 根据文件列表生成manifest文件
      * @param  {[type]} path
      * @param  {[type]} files
      * @return {[type]}
      */
-
     function generateManifest(path, files, options) {
       var _text = [];
       var p;
@@ -71,7 +76,9 @@ module.exports = function(grunt) {
       }
       File.write(path, _text.join('\n'));
     }
+
     //init the file list
+    //初始化所有的文件列表的状态
     this.files.forEach(function(f) {
       filesDone[f.dest]={
         isDone:false,
@@ -79,6 +86,7 @@ module.exports = function(grunt) {
       }
     });
     // Iterate over all specified file groups.
+    // 遍历文件设置列表
     this.files.forEach(function(f) {
       //all the path is relative to the html file
       var htmlSourceList = [],
@@ -91,11 +99,14 @@ module.exports = function(grunt) {
       var OPT = options;
       var allHtmlContent = '';
       //the path of  manifest
+      //最终需要生成manifest的目标地址
       var manifestfile = f.dest;
       //record this file's status
+      //引用当前manifest文件的内容列表
       filesDone[manifestfile].allFiles=allFiles;
 
       //get all html content and fileList
+      //获取所有的html文件列表及其内容列表
       tempList = f.src.filter(function(filepath) {
         var fileObj = {
           path: filepath
@@ -112,6 +123,7 @@ module.exports = function(grunt) {
         }
       });
       //get all the include HTML FILES
+      //如果设置了包含html文件本身，就需要遍历所有的html文件列表，但是路径是相对于manifest文件的路径的
       if (OPT.includeHTML) {
         Util.log('find out the followwing html files:');
         tempList.forEach(function(html) {
@@ -121,6 +133,7 @@ module.exports = function(grunt) {
         });
       }
       //get all js files
+      //如果包含js文件，遍历所有的script标签中的外联文件地址，同样需要相对于mainifeste文件的路径
       if (OPT.includeJS) {
         //becase the js file's path is relatived to the corresponding html file.
         Util.log('find out the followwing javascript files:');
@@ -138,7 +151,8 @@ module.exports = function(grunt) {
           });
         });
       }
-
+      //如果包含html中的图片，就需要遍历所有的img和style中的内联样式的背景图片
+      //由于js代码中也可能有图片的连接等，但是js由于是需要计算执行的，很可能是个动态的地址，所以js当中的内容需要先过滤掉
       if (OPT.includeHtmlImage) {
         Util.log('find out the followwing images from html content:');
         htmlSourceList.forEach(function(fileObj) {
@@ -160,9 +174,10 @@ module.exports = function(grunt) {
           });
         });
       }
-
+      //如果包含css或者css中的图片就需要遍历所有的css内容，及其中的背景图片
       if (OPT.includeCSS || OPT.includeCssImage) {
         //get css link first
+        //获取所有的css外联地址
         htmlSourceList.forEach(function(fileObj) {
           //<link\s+(?:[^>]+\s+)*type=["']\s*text\/css\s*["'](?:\s+[^>]+)*[\s+\/]?>
           var _list = fileObj.content.match(/<link\s+(?:[^>]+\s+)*type=(?:"\s*|'\s*)?text\/css[^>]*>/ig) || [];
@@ -176,6 +191,7 @@ module.exports = function(grunt) {
             cssList.push(_path);
           });
         });
+        //如果包含css中的额图片，就需要加载css的内容，并遍历其中的图片
         //if include the image of css, so every inline css, and import css file should be checked
         if (OPT.includeCssImage) {
           // inline style images
@@ -223,7 +239,7 @@ module.exports = function(grunt) {
           Util.log(cssList.join('\n'));
         }
       }
-
+      //检查是否都处理完毕
       checkDone();
       //merge all the List
 
@@ -242,6 +258,7 @@ module.exports = function(grunt) {
           _list.forEach(function(item) {
             allFiles[item.trim()] = true;
           });
+          //需要排除的文件列表
           //exclude files
           _opt.excludeFiles.forEach(function(item) {
             var p, re, exp;
@@ -263,13 +280,16 @@ module.exports = function(grunt) {
           });
           //add the addtionnal FILES
           Util.log('\n\nadd the extra files:');
+          //需要额外增加的文件列表，比如在js中的文件资源
           _opt.extraFiles.forEach(function(item){
             allFiles[item.trim()] = true;
             Util.log('file :[' + p + '] has been include!');
           });
           filesDone[manifestfile].isDone = true;
+          //生成mainifest文件
           generateManifest(manifestfile, allFiles, _opt);
           //add the manifest file to the html files
+          //自动将对应的html文件加上或者改写manifest文件的地址
           htmlSourceList.forEach(function(item){
               var _path = Util.getRelativePath(item.path, manifestfile);
               item.content= item.content.replace(/\s+manifest=(?:'\s*|"\s*)?[^>]+(?:\s*'|\s*")?\s*/i,' ').replace(/<html\s*/i, '<html manifest="'+_path+'" ');
@@ -282,6 +302,7 @@ module.exports = function(grunt) {
             Util.log('--    '+p);
           }
           Util.log('-------------------------------------------------------------------------------\n');
+          //检查所有的mainfest都生成了
           checkAllManifestDone();
         });
       }
