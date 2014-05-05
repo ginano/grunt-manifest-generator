@@ -30,7 +30,9 @@ module.exports = function(grunt) {
       includeJS: true,
       excludeFiles: [],
       extraFiles:[],
-      network: '*'
+      network: '*',
+      fallback: '',
+      settings: []
     });
     //保留任务完成句柄
     var Alldone = this.async();
@@ -68,11 +70,17 @@ module.exports = function(grunt) {
       options = options || {};
       _text.push('CACHE MANIFEST');
       _text.push('# ' + new Date());
-      _text.push('NETWORK:');
-      _text.push(options.network || '*');
       _text.push('CACHE:');
       for (p in files) {
         _text.push(p);
+      }
+      _text.push('NETWORK:');
+      _text.push(options.network || '*');
+      _text.push('FALLBACK:');
+      _text.push(options.fallback || '');
+      _text.push('SETTINGS:');
+      for (var i = 0 ; i < options.settings.length ; i++) {
+        _text.push(options.settings[i]);
       }
       File.write(path, _text.join('\n'));
     }
