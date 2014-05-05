@@ -232,6 +232,7 @@ module.exports = function(grunt) {
                 if (/^['"]?data:/i.test(str)) {
                   return;
                 }
+                str = str.replace(/["']/g, "");
                 __path = Util.getRelativePath(manifestfile, Util.getAbsolutePath(_path, str));
                 imageList.push(__path);
               });
